@@ -107,114 +107,125 @@ fun BillForm(modifier: Modifier = Modifier, onValueChange: (String) -> Unit = {}
     val percentageState = remember { mutableStateOf(0) }
 
     val tipPercentageState = remember { mutableStateOf(0) }
+    val splintBill = remember { mutableStateOf(0) }
+    if (totalBillState.value.isNotEmpty()) {
+        val totalBill = tipPercentageState.value + totalBillState.value.toInt()
+        splintBill.value = totalBill / splitCounter.value
+    }
 
-
-    Surface(
-        modifier = Modifier
-            .padding(all = 5.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-        border = BorderStroke(width = 1.dp, color = Color.LightGray)
+    Column(
+        modifier = Modifier.padding(6.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
     )
     {
-        Column(
-            modifier = Modifier.padding(6.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-            InputField(
-                valueState = totalBillState,
-                labelId = "Enter Bill",
-                enabled = true,
-                isSingleLine = true,
-                onAction = KeyboardActions {
-                    if (!validState) return@KeyboardActions
-                    onValueChange(totalBillState.value.trim())
-                    keyboardController?.hide()
-                }
-            )
 
-            if (validState) {
-                Row(
-                    modifier = Modifier.padding(3.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = "Split",
-                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
-                    )
-                    Spacer(modifier = Modifier.width(120.dp))
+        TopHeader(totalPerPerson = splintBill.value.toDouble())
 
-                    //to minus the counter
-                    RoundIconButton(imageVector = Icons.Default.Remove, onClick = {
-                        if (splitCounter.value != 1)
-                            splitCounter.value--
-                    })
+        Surface(
+            modifier = Modifier
+                .padding(all = 5.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+            border = BorderStroke(width = 1.dp, color = Color.LightGray)
+        )
+        {
+            Column(
+                modifier = Modifier.padding(6.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                InputField(
+                    valueState = totalBillState,
+                    labelId = "Enter Bill",
+                    enabled = true,
+                    isSingleLine = true,
+                    onAction = KeyboardActions {
+                        if (!validState) return@KeyboardActions
+                        onValueChange(totalBillState.value.trim())
+                        keyboardController?.hide()
+                    }
+                )
 
-                    Text(
-                        text = splitCounter.value.toString(),
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(start = 9.dp, end = 9.dp)
-                    )
+                if (validState) {
+                    Row(
+                        modifier = Modifier.padding(3.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = "Split",
+                            modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.width(120.dp))
 
-                    //to add the counter
-                    RoundIconButton(imageVector = Icons.Default.Add, onClick = {
-                        splitCounter.value++
-                    })
-                }
+                        //to minus the counter
+                        RoundIconButton(imageVector = Icons.Default.Remove, onClick = {
+                            if (splitCounter.value != 1)
+                                splitCounter.value--
+                        })
 
-                Row(
-                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 12.dp),
-                ) {
-                    Text(
-                        text = "Tip",
-                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
-                    )
-                    Spacer(modifier = Modifier.width(200.dp))
+                        Text(
+                            text = splitCounter.value.toString(),
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 9.dp, end = 9.dp)
+                        )
 
-                    if (totalBillState.value.isNotBlank()) {
-                        if (percentageState.value > 0) {
-                            tipPercentageState.value =
-                                totalBillState.value.toInt() / 100 * percentageState.value
-                            Text(
-                                text = "${tipPercentageState.value}$",
-                                modifier = Modifier.align(alignment = Alignment.CenterVertically)
-                            )
-                        }
+                        //to add the counter
+                        RoundIconButton(imageVector = Icons.Default.Add, onClick = {
+                            splitCounter.value++
+                        })
                     }
 
-                }
+                    Row(
+                        modifier = Modifier.padding(horizontal = 3.dp, vertical = 12.dp),
+                    ) {
+                        Text(
+                            text = "Tip",
+                            modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.width(200.dp))
 
-                Column(
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                        if (totalBillState.value.isNotBlank()) {
+                            if (percentageState.value > 0) {
+                                tipPercentageState.value =
+                                    totalBillState.value.toInt() / 100 * percentageState.value
+                                Text(
+                                    text = "${tipPercentageState.value}$",
+                                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                                )
+                            }
+                        }
 
-                    val totalBill = tipPercentageState.value + totalBillState.value.toInt()
+                    }
 
-                    val splintBill = totalBill / splitCounter.value
-                    Text(
-                        text = "${splintBill.toString()}$"
-                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                        Text(
+                            text = "${sliderPositionState.value * 100}$"
+                        )
 
-                    Slider(
-                        value = sliderPositionState.value, onValueChange = { newVal ->
-                            Log.d("Slider", "newVal: $newVal")
-                            sliderPositionState.value = newVal
-                            percentageState.value = (newVal * 100).roundToInt();
-                        }, modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                        steps = 5
-                    )
-                }
-            } else {
-                Box() {
+                        Spacer(modifier = Modifier.height(14.dp))
 
+                        Slider(
+                            value = sliderPositionState.value, onValueChange = { newVal ->
+                                Log.d("Slider", "newVal: $newVal")
+                                sliderPositionState.value = newVal
+                                percentageState.value = (newVal * 100).roundToInt();
+                            }, modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                            steps = 5
+                        )
+                    }
+                } else {
+                    Box() {
+
+                    }
                 }
             }
         }

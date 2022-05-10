@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.example.tipappcompose.components.InputField
 import com.example.tipappcompose.ui.theme.TipAppComposeTheme
 import com.example.tipappcompose.widget.RoundIconButton
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -100,6 +102,13 @@ fun BillForm(modifier: Modifier = Modifier, onValueChange: (String) -> Unit = {}
 
     val splitCounter = remember { mutableStateOf(1) }
 
+    val sliderPositionState = remember { mutableStateOf(0f) }
+
+    val percentageState = remember { mutableStateOf(0) }
+
+    val tipPercentageState = remember { mutableStateOf(0) }
+
+
     Surface(
         modifier = Modifier
             .padding(all = 5.dp)
@@ -155,15 +164,60 @@ fun BillForm(modifier: Modifier = Modifier, onValueChange: (String) -> Unit = {}
                     })
                 }
 
+                Row(
+                    modifier = Modifier.padding(horizontal = 3.dp, vertical = 12.dp),
+                ) {
+                    Text(
+                        text = "Tip",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                    Spacer(modifier = Modifier.width(200.dp))
+
+                    if (totalBillState.value.isNotBlank()) {
+                        if (percentageState.value > 0) {
+                            tipPercentageState.value =
+                                totalBillState.value.toInt() / 100 * percentageState.value
+                            Text(
+                                text = "${tipPercentageState.value}$",
+                                modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                            )
+                        }
+                    }
+
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    val totalBill = tipPercentageState.value + totalBillState.value.toInt()
+
+                    val splintBill = totalBill / splitCounter.value
+                    Text(
+                        text = "${splintBill.toString()}$"
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Slider(
+                        value = sliderPositionState.value, onValueChange = { newVal ->
+                            Log.d("Slider", "newVal: $newVal")
+                            sliderPositionState.value = newVal
+                            percentageState.value = (newVal * 100).roundToInt();
+                        }, modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                        steps = 5
+                    )
+                }
             } else {
                 Box() {
 
                 }
             }
-
-
         }
-
     }
 }
 
